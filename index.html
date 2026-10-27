@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mutabaah Kembaranas III 2026 & PPIM Nasional</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        },
+                        amber: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        arabic: ['Amiri', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <!-- Firebase Compat SDKs (App & Firestore) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #10b981;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #047857;
+        }
+
+        /* Glassmorphism background */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        /* Animations */
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.6); }
+        }
+        .pulse-badge {
+            animation: pulseGlow 2.5s infinite;
+        }
+
+        /* Print Media Styles for PDF Export */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                font-size: 12pt;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            .shadow-lg, .shadow-xl, .shadow-md {
+                box-shadow: none !important;
+            }
+            .border-emerald-600 {
+                border-color: #000000 !important;
+            }
+        }
+
+        .print-only {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
+
+    <!-- TOP HEADER NAVBAR -->
+    <header class="bg-gradient-to-r from-emerald-900 via-emerald-800 to-teal-900 text-white shadow-lg sticky top-0 z-40 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Brand Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500 flex items-center justify-center text-emerald-950 font-bold text-2xl shadow-md border-2 border-amber-300">
+                        <i class="fa-solid font-bold fa-compass"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-bold text-lg sm:text-xl tracking-wide text-amber-300 leading-tight">MUTABAAH KEMBARANAS III</h1>
+                            <span class="bg-amber-400/20 text-amber-300 text-xs px-2 py-0.5 rounded-full font-semibold border border-amber-400/30">2026</span>
+                        </div>
+                        <p class="text-xs text-emerald-200 tracking-wider"> & PPIM NASIONAL - PANDU PRAMUKA ISLAM</p>
+                    </div>
+                </div>
+
+                <!-- Status & Mode Actions -->
+                <div class="flex items-center space-x-3">
+                    <!-- Firebase Connection Badge -->
+                    <div id="connection-badge" class="hidden sm:flex items-center space-x-1.5 text-xs bg-emerald-950/60 border border-emerald-600/50 px-3 py-1.5 rounded-full text-emerald-300">
+                        <span id="conn-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span id="conn-text" class="font-medium">Firebase Online</span>
+                    </div>
+
+                    <!-- Toggle Admin Button -->
+                    <button id="admin-toggle-btn" onclick="toggleAdminMode()" class="bg-amber-500 hover:bg-amber-600 text-emerald-950 font-bold px-3.5 py-2 rounded-lg text-xs sm:text-sm transition duration-200 flex items-center space-x-2 shadow-md">
+                        <i class="fa-solid fa-lock" id="admin-icon"></i>
+                        <span id="admin-btn-text">Mode Admin</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs Bar -->
+        <div class="bg-emerald-950/80 backdrop-blur border-t border-emerald-800/60 px-4">
+            <div class="max-w-7xl mx-auto flex space-x-1 sm:space-x-4 overflow-x-auto py-2 scrollbar-none">
+                <button onclick="switchTab('form')" id="tab-btn-form" class="tab-btn active-tab px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-amber-300 bg-emerald-800/80 transition flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-pen-to-square"></i> Input Mutabaah
+                </button>
+                <button onclick="switchTab('history')" id="tab-btn-history" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-emerald-200 hover:text-white hover:bg-emerald-800/40 transition flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Riwayat Saya
+                </button>
+                <button onclick="switchTab('leaderboard')" id="tab-btn-leaderboard" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-emerald-200 hover:text-white hover:bg-emerald-800/40 transition flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-trophy"></i> Leaderboard & Grafik
+                </button>
+                <button onclick="switchTab('report')" id="tab-btn-report" class="tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-emerald-200 hover:text-white hover:bg-emerald-800/40 transition flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-file-invoice"></i> Rekap Harian / PDF
+                </button>
+                <button onclick="switchTab('admin')" id="tab-btn-admin" class="tab-btn hidden px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-amber-300 bg-amber-900/40 border border-amber-500/40 transition flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-user-shield"></i> Panel Kelola Admin
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- BROADCAST ANNOUNCEMENT BANNER -->
+    <div id="broadcast-banner" class="bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600 text-emerald-950 py-2.5 px-4 shadow-inner no-print transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex items-center justify-between text-xs sm:text-sm font-semibold">
+            <div class="flex items-center space-x-2 overflow-hidden">
+                <span class="bg-emerald-900 text-amber-300 text-xs uppercase px-2 py-0.5 rounded font-bold shrink-0">Pengumuman</span>
+                <marquee class="font-medium" id="broadcast-text">Selamat Datang Peserta Kembaranas III 2026 & PPIM Nasional! Istiqomahkan Amalan Yaumiyah Setiap Hari.</marquee>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+        <!-- ========================================== -->
+        <!-- VIEW 1: FORM MUTABAAH PARTICIPANT          -->
+        <!-- ========================================== -->
+        <section id="view-form" class="space-y-6">
+            
+            <!-- Banner & Score Live Engine Indicator -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Title Card -->
+                <div class="lg:col-span-2 bg-gradient-to-br from-emerald-800 to-teal-900 text-white p-6 rounded-2xl shadow-xl relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 opacity-10 text-9xl font-arabic pointer-events-none">
+                        الله
+                    </div>
+                    <div class="relative z-10">
+                        <div class="font-arabic text-2xl sm:text-3xl text-amber-300 mb-1">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+                        <h2 class="text-2xl font-bold mb-2">Lembar Mutabaah Yaumiyah</h2>
+                        <p class="text-emerald-100 text-sm max-w-xl">
+                            Isi evaluasi amalan ibadah harian Anda secara jujur dan konsisten untuk membentuk karakter Pramuka Islam yang bertaqwa dan berakhlak mulia.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Live Score Calculator Card -->
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-emerald-100 flex flex-col justify-between relative">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Estimasi Skor Hari Ini</span>
+                        <span id="score-badge" class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-300">
+                            Tunas Harapan
+                        </span>
+                    </div>
+                    <div class="flex items-baseline justify-between my-2">
+                        <div class="flex items-baseline gap-1">
+                            <span id="live-score-val" class="text-5xl font-extrabold text-emerald-600">0</span>
+                            <span class="text-slate-400 font-semibold text-lg">/ 100 Pts</span>
+                        </div>
+                        <div class="text-right">
+                            <i class="fa-solid fa-award text-4xl text-amber-400"></i>
+                        </div>
+                    </div>
+                    <!-- Score Progress Bar -->
+                    <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                        <div id="live-score-bar" class="bg-gradient-to-r from-amber-400 to-emerald-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lock Notice if Admin Locks Submission -->
+            <div id="lock-warning" class="hidden bg-rose-50 border-l-4 border-rose-500 p-4 rounded-xl text-rose-800 text-sm font-medium">
+                <i class="fa-solid fa-lock text-rose-600 mr-2"></i> Pengisian Mutabaah saat ini sedang dikunci oleh Panitia Admin.
+            </div>
+
+            <!-- FORM START -->
+            <form id="mutabaah-form" onsubmit="handleFormSubmit(event)" class="space-y-6">
+
+                <!-- 1. IDENTITAS PESERTA -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-base font-bold text-emerald-800 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-id-card text-emerald-600"></i> Data Diri Peserta
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Lengkap *</label>
+                            <input type="text" id="inp-nama" required placeholder="Contoh: Ahmad Fauzi"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Kwarda / Kwartir / Regu *</label>
+                            <input type="text" id="inp-kwarda" required placeholder="Contoh: Kwarda Lampung / Regu Garuda"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tanggal Mutabaah *</label>
+                            <input type="date" id="inp-tanggal" required
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. SHALAT FARDHU 5 WAKTU -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-bold text-emerald-800 flex items-center gap-2">
+                            <i class="fa-solid fa-mosque text-emerald-600"></i> Shalat Fardhu 5 Waktu
+                        </h3>
+                        <span class="text-xs text-slate-500 font-normal">*Centang berjamaah jika dilaksanakan secara berjamaah</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                        <!-- Subuh -->
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-emerald-50/50 transition">
+                            <div class="font-bold text-slate-800 mb-2 text-sm flex items-center justify-between">
+                                Subuh
+                                <i class="fa-solid fa-sun-plant-wilt text-amber-500"></i>
+                            </div>
+                            <label class="flex items-center space-x-2 text-xs font-medium text-slate-700 cursor-pointer mb-2">
+                                <input type="checkbox" id="shalat-subuh" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                <span>Dilaksanakan</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-emerald-700 font-semibold cursor-pointer">
+                                <input type="checkbox" id="shalat-subuh-jamaah" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                <span>+ Berjamaah</span>
+                            </label>
+                        </div>
+
+                        <!-- Dzuhur -->
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-emerald-50/50 transition">
+                            <div class="font-bold text-slate-800 mb-2 text-sm flex items-center justify-between">
+                                Dzuhur
+                                <i class="fa-solid fa-sun text-amber-500"></i>
+                            </div>
+                            <label class="flex items-center space-x-2 text-xs font-medium text-slate-700 cursor-pointer mb-2">
+                                <input type="checkbox" id="shalat-dzuhur" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                <span>Dilaksanakan</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-emerald-700 font-semibold cursor-pointer">
+                                <input type="checkbox" id="shalat-dzuhur-jamaah" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                <span>+ Berjamaah</span>
+                            </label>
+                        </div>
+
+                        <!-- Ashar -->
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-emerald-50/50 transition">
+                            <div class="font-bold text-slate-800 mb-2 text-sm flex items-center justify-between">
+                                Ashar
+                                <i class="fa-solid fa-cloud-sun text-amber-500"></i>
+                            </div>
+                            <label class="flex items-center space-x-2 text-xs font-medium text-slate-700 cursor-pointer mb-2">
+                                <input type="checkbox" id="shalat-ashar" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                <span>Dilaksanakan</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-emerald-700 font-semibold cursor-pointer">
+                                <input type="checkbox" id="shalat-ashar-jamaah" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                <span>+ Berjamaah</span>
+                            </label>
+                        </div>
+
+                        <!-- Maghrib -->
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-emerald-50/50 transition">
+                            <div class="font-bold text-slate-800 mb-2 text-sm flex items-center justify-between">
+                                Maghrib
+                                <i class="fa-solid fa-cloud-moon text-indigo-500"></i>
+                            </div>
+                            <label class="flex items-center space-x-2 text-xs font-medium text-slate-700 cursor-pointer mb-2">
+                                <input type="checkbox" id="shalat-maghrib" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                <span>Dilaksanakan</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-emerald-700 font-semibold cursor-pointer">
+                                <input type="checkbox" id="shalat-maghrib-jamaah" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                <span>+ Berjamaah</span>
+                            </label>
+                        </div>
+
+                        <!-- Isya -->
+                        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-emerald-50/50 transition">
+                            <div class="font-bold text-slate-800 mb-2 text-sm flex items-center justify-between">
+                                Isya
+                                <i class="fa-solid fa-moon text-indigo-700"></i>
+                            </div>
+                            <label class="flex items-center space-x-2 text-xs font-medium text-slate-700 cursor-pointer mb-2">
+                                <input type="checkbox" id="shalat-isya" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                <span>Dilaksanakan</span>
+                            </label>
+                            <label class="flex items-center space-x-2 text-xs text-emerald-700 font-semibold cursor-pointer">
+                                <input type="checkbox" id="shalat-isya-jamaah" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                                <span>+ Berjamaah</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. SHALAT SUNNAH & TILAWAH AL-QUR'AN -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Shalat Sunnah Card -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <h3 class="text-base font-bold text-emerald-800 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-hands-praying text-emerald-600"></i> Shalat Sunnah
+                        </h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-emerald-400 cursor-pointer text-sm">
+                                <span class="font-medium text-slate-700">Tahajud / Qiyamul Lail</span>
+                                <input type="checkbox" id="sunnah-tahajud" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                            </label>
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-emerald-400 cursor-pointer text-sm">
+                                <span class="font-medium text-slate-700">Shalat Dhuha</span>
+                                <input type="checkbox" id="sunnah-dhuha" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                            </label>
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-emerald-400 cursor-pointer text-sm">
+                                <span class="font-medium text-slate-700">Shalat Rawatib (Qabliyah/Ba'diyah)</span>
+                                <input type="checkbox" id="sunnah-rawatib" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                            </label>
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-emerald-400 cursor-pointer text-sm">
+                                <span class="font-medium text-slate-700">Shalat Witir</span>
+                                <input type="checkbox" id="sunnah-witir" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Tilawah Al-Qur'an Card -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <h3 class="text-base font-bold text-emerald-800 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-book-quran text-emerald-600"></i> Tilawah Al-Qur'an
+                        </h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Capaian Juz Hari Ini</label>
+                                <select id="tilawah-juz" onchange="calcLiveScore()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 text-sm">
+                                    <option value="0">Belum Tilawah / 0 Juz</option>
+                                    <script>
+                                        for(let i=1; i<=30; i++) {
+                                            document.write(`<option value="${i}">Juz ${i}</option>`);
+                                        }
+                                    </script>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Surah & Halaman / Ayat</label>
+                                <input type="text" id="tilawah-surah" placeholder="Contoh: QS. Al-Baqarah Hal 15-20"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 text-sm">
+                            </div>
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-emerald-200 bg-emerald-50/40 cursor-pointer text-sm font-semibold text-emerald-800">
+                                <span>🎉 Khatam Al-Qur'an Hari Ini</span>
+                                <input type="checkbox" id="tilawah-khatam" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. AMALAN YAUMIYAAH & KEHADIRAN KEMBARANAS -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Amalan Yaumiyah -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <h3 class="text-base font-bold text-emerald-800 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-heart-pulse text-emerald-600"></i> Amalan Yaumiyah
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="flex items-center space-x-2 p-2.5 rounded-xl border border-slate-200 hover:border-emerald-400 cursor-pointer text-xs font-medium">
+                                    <input type="checkbox" id="amalan-dzikir-pagi" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded">
+                                    <span>Dzikir Pagi</span>
+                                </label>
+                                <label class="flex items-center space-x-2 p-2.5 rounded-xl border border-slate-200 hover:border-emerald-400 cursor-pointer text-xs font-medium">
+                                    <input type="checkbox" id="amalan-dzikir-sore" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded">
+                                    <span>Dzikir Sore</span>
+                                </label>
+                            </div>
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-emerald-400 cursor-pointer text-sm">
+                                <span class="font-medium text-slate-700">Membaca Al-Ma'tsurat</span>
+                                <input type="checkbox" id="amalan-almatsurat" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded">
+                            </label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="flex items-center space-x-2 p-2.5 rounded-xl border border-slate-200 hover:border-emerald-400 cursor-pointer text-xs font-medium">
+                                    <input type="checkbox" id="amalan-olahraga" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded">
+                                    <span>Olahraga / Kebugaran</span>
+                                </label>
+                                <label class="flex items-center space-x-2 p-2.5 rounded-xl border border-slate-200 hover:border-emerald-400 cursor-pointer text-xs font-medium">
+                                    <input type="checkbox" id="amalan-puasa" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded">
+                                    <span>Puasa Sunnah</span>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Infaq / Sedekah Hari Ini (Rp)</label>
+                                <input type="number" id="amalan-infaq" min="0" step="1000" placeholder="0" oninput="calcLiveScore()"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kehadiran Kegiatan Kembaranas III -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <h3 class="text-base font-bold text-emerald-800 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-users text-emerald-600"></i> Kehadiran Sesi Kembaranas III
+                        </h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-emerald-400 cursor-pointer text-sm">
+                                <span class="font-medium text-slate-700">Apel Pagi & Malam Kegiatan</span>
+                                <input type="checkbox" id="sesi-apel" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded">
+                            </label>
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-emerald-400 cursor-pointer text-sm">
+                                <span class="font-medium text-slate-700">Sesi Materi & Kajian PPIM</span>
+                                <input type="checkbox" id="sesi-materi" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded">
+                            </label>
+                            <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-emerald-400 cursor-pointer text-sm">
+                                <span class="font-medium text-slate-700">Outbound / Ukhuwah Lapangan</span>
+                                <input type="checkbox" id="sesi-outbound" onchange="calcLiveScore()" class="w-4 h-4 text-emerald-600 rounded">
+                            </label>
+
+                            <!-- Catatan tambahan -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Catatan Evaluasi / Refleksi Diri</label>
+                                <textarea id="inp-catatan" rows="2" placeholder="Tuliskan refleksi atau komitmen kebaikan Anda hari ini..."
+                                    class="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 text-xs"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUBMIT BUTTON AREA -->
+                <div class="flex items-center justify-end gap-4 pt-4">
+                    <button type="button" onclick="resetForm()" class="px-5 py-3 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-100 font-semibold text-sm transition">
+                        Reset Form
+                    </button>
+                    <button type="submit" id="submit-btn" class="px-8 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg hover:shadow-xl transition flex items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> Simpan Mutabaah Hari Ini
+                    </button>
+                </div>
+
+            </form>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: RIWAYAT MUTABAAH PARTICIPANT       -->
+        <!-- ========================================== -->
+        <section id="view-history" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-emerald-900">Riwayat Pengisian Mutabaah Saya</h2>
+                        <p class="text-xs text-slate-500">Daftar catatan amalan yang telah Anda kumpulkan selama kegiatan Kembaranas III 2026.</p>
+                    </div>
+                </div>
+
+                <!-- History Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase">
+                            <tr>
+                                <th class="p-3 font-semibold">Tanggal</th>
+                                <th class="p-3 font-semibold">Nama Peserta</th>
+                                <th class="p-3 font-semibold">Kwarda/Regu</th>
+                                <th class="p-3 font-semibold text-center">Fardhu</th>
+                                <th class="p-3 font-semibold text-center">Tilawah</th>
+                                <th class="p-3 font-semibold text-center">Infaq</th>
+                                <th class="p-3 font-semibold text-center">Skor</th>
+                                <th class="p-3 font-semibold text-center">Predikat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body" class="divide-y divide-slate-100">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 3: LEADERBOARD & GRAFIK ANALYTICS      -->
+        <!-- ========================================== -->
+        <section id="view-leaderboard" class="hidden space-y-6">
+            <!-- Top Stats Summary Bar -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-emerald-100 flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-extrabold text-slate-800" id="stat-total-peserta">0</div>
+                        <div class="text-xs text-slate-500 font-medium">Total Peserta Aktif</div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-emerald-100 flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-extrabold text-slate-800" id="stat-total-infaq">Rp 0</div>
+                        <div class="text-xs text-slate-500 font-medium">Total Infaq Terkumpul</div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-emerald-100 flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-book-quran"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-extrabold text-slate-800" id="stat-total-juz">0 Juz</div>
+                        <div class="text-xs text-slate-500 font-medium">Tilawah Al-Qur'an</div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-emerald-100 flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-extrabold text-slate-800" id="stat-avg-score">0 Pts</div>
+                        <div class="text-xs text-slate-500 font-medium">Rata-rata Skor Event</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leaderboard Top 10 Card -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-base font-bold text-emerald-900 mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-ranking-star text-amber-500"></i> Leaderboard 10 Peserta Terbaik (Akumulasi)
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs sm:text-sm">
+                            <thead class="bg-slate-50 text-slate-600 uppercase border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3 text-center">Peringkat</th>
+                                    <th class="p-3">Nama Peserta</th>
+                                    <th class="p-3">Kwarda / Regu</th>
+                                    <th class="p-3 text-center">Total Skor</th>
+                                    <th class="p-3 text-center">Badge</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboard-table-body" class="divide-y divide-slate-100">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Distribution Chart Card -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <h3 class="text-base font-bold text-emerald-900 mb-2">Sebaran Predikat Mutabaah</h3>
+                    <div class="relative flex-1 flex items-center justify-center py-4">
+                        <canvas id="chart-predikat" class="max-h-56"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 4: LAPORAN KHUSUS & PRINT PDF        -->
+        <!-- ========================================== -->
+        <section id="view-report" class="space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 no-print">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-emerald-900">Laporan & Rekap Kegiatan Kembaranas III</h2>
+                        <p class="text-xs text-slate-500">Pilih jenis laporan yang ingin Anda lihat atau cetak sebagai dokumen resmi PDF.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="generateReport('daily')" class="px-4 py-2 bg-emerald-100 text-emerald-800 rounded-xl text-xs font-bold hover:bg-emerald-200 transition">
+                            <i class="fa-solid fa-calendar-day mr-1"></i> Rekap Harian
+                        </button>
+                        <button onclick="generateReport('final')" class="px-4 py-2 bg-amber-500 text-emerald-950 rounded-xl text-xs font-bold hover:bg-amber-600 transition shadow">
+                            <i class="fa-solid fa-flag-checkered mr-1"></i> Laporan Akhir Kegiatan
+                        </button>
+                        <button onclick="window.print()" class="px-4 py-2 bg-emerald-700 text-white rounded-xl text-xs font-bold hover:bg-emerald-800 transition shadow">
+                            <i class="fa-solid fa-print mr-1"></i> Cetak / Save PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PRINTABLE REPORT PAPER CONTAINER -->
+            <div id="report-paper" class="bg-white p-8 rounded-2xl shadow-md border border-slate-200 print:shadow-none print:p-0">
+                <!-- Header Laporan Resmi -->
+                <div class="text-center border-b-2 border-emerald-800 pb-4 mb-6">
+                    <h2 class="text-2xl font-bold text-emerald-900 tracking-wide uppercase">LAPORAN MUTABAAH YAUMIYYAH PESERTA</h2>
+                    <h3 class="text-base font-semibold text-slate-700">KEMBARANAS III 2026 & PPIM NASIONAL</h3>
+                    <p class="text-xs text-slate-500" id="report-date-subtitle">Tanggal Rekap: Kumulatif Sesi Kegiatan</p>
+                </div>
+
+                <!-- Ringkasan Statistik Laporan -->
+                <div class="grid grid-cols-4 gap-4 mb-6">
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                        <div class="text-xs text-slate-500">Total Peserta Inisiasi</div>
+                        <div class="text-xl font-bold text-emerald-800" id="rep-stat-peserta">0</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                        <div class="text-xs text-slate-500">Rata-rata Skor Mutabaah</div>
+                        <div class="text-xl font-bold text-emerald-800" id="rep-stat-skor">0 Pts</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                        <div class="text-xs text-slate-500">Total Infaq Terkumpul</div>
+                        <div class="text-xl font-bold text-amber-600" id="rep-stat-infaq">Rp 0</div>
+                    </div>
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-center">
+                        <div class="text-xs text-slate-500">Total Tilawah Qur'an</div>
+                        <div class="text-xl font-bold text-teal-700" id="rep-stat-juz">0 Juz</div>
+                    </div>
+                </div>
+
+                <!-- Table Laporan -->
+                <h4 class="font-bold text-slate-800 text-sm mb-3">Rincian Capaian Peserta Terbaik</h4>
+                <div class="overflow-x-auto mb-8">
+                    <table class="w-full text-left text-xs border border-slate-300">
+                        <thead class="bg-emerald-800 text-white uppercase font-bold">
+                            <tr>
+                                <th class="p-2.5 border border-emerald-900 text-center">No</th>
+                                <th class="p-2.5 border border-emerald-900">Nama Peserta</th>
+                                <th class="p-2.5 border border-emerald-900">Kwarda/Regu</th>
+                                <th class="p-2.5 border border-emerald-900 text-center">Fardhu (Avg)</th>
+                                <th class="p-2.5 border border-emerald-900 text-center">Tilawah</th>
+                                <th class="p-2.5 border border-emerald-900 text-right">Infaq</th>
+                                <th class="p-2.5 border border-emerald-900 text-center">Skor Akhir</th>
+                                <th class="p-2.5 border border-emerald-900 text-center">Predikat</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table-body" class="divide-y divide-slate-200">
+                            <!-- Dynamically Generated -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Signature Section for Print PDF -->
+                <div class="hidden print:grid grid-cols-2 gap-8 text-xs text-center pt-8 border-t border-slate-200">
+                    <div>
+                        <p class="mb-12 font-medium">Koordinator Divisi Acara Kembaranas III,</p>
+                        <p class="font-bold underline uppercase">( ________________________ )</p>
+                    </div>
+                    <div>
+                        <p class="mb-12 font-medium">Panitia Pembina PPIM Nasional,</p>
+                        <p class="font-bold underline uppercase">( ________________________ )</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW 5: ADMIN MANAGEMENT PANEL (PIN PROTECTED) -->
+        <!-- ========================================== -->
+        <section id="view-admin" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-amber-600 flex items-center gap-2">
+                            <i class="fa-solid fa-user-shield"></i> Panel Master Pengelolaan Admin
+                        </h2>
+                        <p class="text-xs text-slate-500">Kelola master database 200+ peserta, ekspor spreadsheet, dan kunci pengisian form.</p>
+                    </div>
+
+                    <!-- Admin Action Toolbar -->
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button onclick="toggleLockForm()" id="btn-lock-toggle" class="px-4 py-2 bg-amber-100 text-amber-800 rounded-xl text-xs font-bold hover:bg-amber-200 transition">
+                            <i class="fa-solid fa-lock mr-1"></i> <span id="lock-btn-label">Kunci Form Pengisian</span>
+                        </button>
+                        <button onclick="exportToCSV()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition shadow">
+                            <i class="fa-solid fa-file-csv mr-1"></i> Ekspor CSV / Excel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Broadcast Announcement Setter -->
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 mb-6">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Update Banner Pengumuman Peserta</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="inp-broadcast-admin" placeholder="Ketik pesan pengumuman untuk seluruh peserta..."
+                            class="flex-1 px-3.5 py-2 rounded-xl border border-slate-300 text-xs">
+                        <button onclick="saveBroadcastText()" class="px-4 py-2 bg-emerald-700 text-white rounded-xl text-xs font-bold hover:bg-emerald-800">
+                            Simpan Pengumuman
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Master Table with Search Filter -->
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
+                    <div class="relative w-full sm:w-72">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+                        <input type="text" id="admin-search-inp" onkeyup="filterAdminTable()" placeholder="Cari Nama / Kwarda..."
+                            class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div class="text-xs text-slate-500 font-medium">
+                        Total Data Terdaftar: <span id="admin-count-badge" class="font-bold text-emerald-800">0</span> Dokumen
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-100 text-slate-700 uppercase">
+                            <tr>
+                                <th class="p-3">Tanggal</th>
+                                <th class="p-3">Nama Lengkap</th>
+                                <th class="p-3">Kwarda / Regu</th>
+                                <th class="p-3 text-center">Skor</th>
+                                <th class="p-3 text-center">Tilawah</th>
+                                <th class="p-3 text-right">Infaq</th>
+                                <th class="p-3 text-center">Aksi Admin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-table-body" class="divide-y divide-slate-100">
+                            <!-- Dynamic admin rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 no-print text-xs">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+            <p class="font-medium text-slate-300">Kembaranas III 2026 & PPIM Nasional &copy; 2026 Pandu Pramuka Islam</p>
+            <p class="text-slate-500">Sistem Aplikasi Mutabaah Yaumiyah Real-time | Firebase Cloud Integrated</p>
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- MODALS & TOAST NOTIFICATIONS              -->
+    <!-- ========================================== -->
+
+    <!-- PIN Admin Verification Modal -->
+    <div id="pin-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white max-w-sm w-full rounded-2xl p-6 shadow-2xl border border-slate-100 text-center space-y-4">
+            <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-2xl mx-auto">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-slate-800">Verifikasi Hak Akses Admin</h3>
+                <p class="text-xs text-slate-500 mt-1">Masukkan PIN 4-digit khusus Panitia Admin.</p>
+            </div>
+            <input type="password" id="admin-pin-input" maxlength="6" placeholder="PIN Admin (Default: 2026)"
+                class="w-full px-4 py-2.5 text-center tracking-widest text-lg font-bold border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500">
+            <div class="flex gap-2">
+                <button onclick="closePinModal()" class="flex-1 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-600 hover:bg-slate-100">
+                    Batal
+                </button>
+                <button onclick="verifyAdminPin()" class="flex-1 py-2.5 rounded-xl bg-amber-500 text-emerald-950 text-xs font-bold hover:bg-amber-600 shadow">
+                    Masuk Mode Admin
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Toast Notification -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT APP LOGIC & FIREBASE SDK SETUP  -->
+    <!-- ========================================== -->
+    <script>
+        // ----------------------------------------------------
+        // 1. FIREBASE CONFIGURATION & INITIALIZATION
+        // ----------------------------------------------------
+        const firebaseConfig = {
+            apiKey: "AIzaSyDXxMkJ2XBDIui7Ex447r9msfBFE9eu7-E",
+            authDomain: "mutabaah-kembaranas-2026.firebaseapp.com",
+            databaseURL: "https://mutabaah-kembaranas-2026-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "mutabaah-kembaranas-2026",
+            storageBucket: "mutabaah-kembaranas-2026.firebasestorage.app",
+            messagingSenderId: "923461788013",
+            appId: "1:923461788013:web:2c5ffea6fa34d10f227a64",
+            measurementId: "G-09VV9G5HCV"
+        };
+
+        let db = null;
+        let isFirebaseOnline = false;
+        let mutabaahCollectionRef = null;
+
+        // Unified Local Data Array
+        let localRecords = JSON.parse(localStorage.getItem('mutabaah_kembaranas_records')) || [];
+        let isFormLocked = localStorage.getItem('mutabaah_locked') === 'true';
+
+        // Admin Auth State
+        let isAdminLoggedIn = false;
+        const ADMIN_PIN_DEFAULT = "2026";
+
+        // Chart Instance
+        let predikatChart = null;
+
+        // Initialize Firebase on window load
+        window.addEventListener('load', () => {
+            initFirebase();
+            setDefaultDate();
+            calcLiveScore();
+            renderAllViews();
+            checkLockState();
+        });
+
+        function initFirebase() {
+            try {
+                if (typeof firebase !== 'undefined') {
+                    firebase.initializeApp(firebaseConfig);
+                    db = firebase.firestore();
+                    
+                    // Recommended path rule compliant
+                    mutabaahCollectionRef = db.collection('artifacts')
+                                             .doc('mutabaah-kembaranas-2026')
+                                             .collection('public')
+                                             .doc('data')
+                                             .collection('records');
+
+                    isFirebaseOnline = true;
+                    updateConnBadge(true);
+                    setupRealtimeSync();
+                } else {
+                    throw new Error("SDK Firebase tidak terload");
+                }
+            } catch (err) {
+                console.warn("Menggunakan penyimpanan lokal Offline LocalStorage fallback:", err);
+                isFirebaseOnline = false;
+                updateConnBadge(false);
+            }
+        }
+
+        function updateConnBadge(online) {
+            const badge = document.getElementById('connection-badge');
+            const dot = document.getElementById('conn-dot');
+            const text = document.getElementById('conn-text');
+
+            if (online) {
+                badge.className = "hidden sm:flex items-center space-x-1.5 text-xs bg-emerald-950/60 border border-emerald-600/50 px-3 py-1.5 rounded-full text-emerald-300";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+                text.innerText = "Firebase Cloud Online";
+            } else {
+                badge.className = "hidden sm:flex items-center space-x-1.5 text-xs bg-amber-950/60 border border-amber-600/50 px-3 py-1.5 rounded-full text-amber-300";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-400";
+                text.innerText = "Mode Offline (LocalStorage)";
+            }
+        }
+
+        function setupRealtimeSync() {
+            if (!mutabaahCollectionRef) return;
+
+            mutabaahCollectionRef.onSnapshot((snapshot) => {
+                const fetched = [];
+                snapshot.forEach(doc => {
+                    fetched.push({ id: doc.id, ...doc.data() });
+                });
+                
+                if (fetched.length > 0) {
+                    localRecords = fetched;
+                    localStorage.setItem('mutabaah_kembaranas_records', JSON.stringify(localRecords));
+                    renderAllViews();
+                }
+            }, (error) => {
+                console.warn("Firestore snapshot query failed, falling back to local dataset", error);
+                updateConnBadge(false);
+            });
+        }
+
+        // ----------------------------------------------------
+        // 2. SCORE CALCULATION ENGINE (0 - 100 PTS)
+        // ----------------------------------------------------
+        function calcLiveScore() {
+            let score = 0;
+
+            // 1. Shalat Fardhu (Max 40 Pts) -> 5 x 5 pts (+3 if berjamaah)
+            const fardhu = ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'];
+            fardhu.forEach(s => {
+                const checked = document.getElementById(`shalat-${s}`).checked;
+                const jamaah = document.getElementById(`shalat-${s}-jamaah`).checked;
+                if (checked) {
+                    score += 5;
+                    if (jamaah) score += 3;
+                }
+            });
+
+            // 2. Shalat Sunnah (Max 16 Pts) -> 4 x 4 pts
+            ['tahajud', 'dhuha', 'rawatib', 'witir'].forEach(s => {
+                if (document.getElementById(`sunnah-${s}`).checked) score += 4;
+            });
+
+            // 3. Tilawah Al-Qur'an (Max 20 Pts)
+            const juzVal = parseInt(document.getElementById('tilawah-juz').value) || 0;
+            if (juzVal > 0) score += 10;
+            if (juzVal >= 1) score += 5;
+            if (document.getElementById('tilawah-khatam').checked) score += 5;
+
+            // 4. Amalan Yaumiyah (Max 16 Pts)
+            if (document.getElementById('amalan-dzikir-pagi').checked) score += 3;
+            if (document.getElementById('amalan-dzikir-sore').checked) score += 3;
+            if (document.getElementById('amalan-almatsurat').checked) score += 4;
+            if (document.getElementById('amalan-olahraga').checked) score += 3;
+            if (document.getElementById('amalan-puasa').checked) score += 3;
+            
+            const infaqVal = parseFloat(document.getElementById('amalan-infaq').value) || 0;
+            if (infaqVal > 0) score += 4;
+
+            // 5. Kehadiran Sesi (Max 8 Pts)
+            if (document.getElementById('sesi-apel').checked) score += 3;
+            if (document.getElementById('sesi-materi').checked) score += 3;
+            if (document.getElementById('sesi-outbound').checked) score += 2;
+
+            // Normalize Max 100
+            score = Math.min(100, score);
+
+            // Update UI Gauges
+            document.getElementById('live-score-val').innerText = score;
+            document.getElementById('live-score-bar').style.width = `${score}%`;
+
+            // Badge Determination
+            const badgeElem = document.getElementById('score-badge');
+            let badgeInfo = getBadgePredicate(score);
+            badgeElem.innerText = badgeInfo.label;
+            badgeElem.className = `text-xs font-bold px-2.5 py-1 rounded-full border ${badgeInfo.style}`;
+
+            return { score, predicate: badgeInfo.label };
+        }
+
+        function getBadgePredicate(score) {
+            if (score >= 90) return { label: "🌟 Bintang Istiqomah", style: "bg-amber-100 text-amber-800 border-amber-300" };
+            if (score >= 75) return { label: "⚔️ Pejuang Sunnah", style: "bg-emerald-100 text-emerald-800 border-emerald-300" };
+            if (score >= 60) return { label: "⚜️ Pandu Teladan", style: "bg-teal-100 text-teal-800 border-teal-300" };
+            return { label: "🌱 Tunas Harapan", style: "bg-slate-100 text-slate-700 border-slate-300" };
+        }
+
+        // ----------------------------------------------------
+        // 3. FORM SUBMISSION HANDLER
+        // ----------------------------------------------------
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            if (isFormLocked && !isAdminLoggedIn) {
+                showToast("Pengisian form sedang dikunci oleh Panitia Admin!", "error");
+                return;
+            }
+
+            const scoreObj = calcLiveScore();
+            const record = {
+                id: 'REC-' + Date.now(),
+                nama: document.getElementById('inp-nama').value.trim(),
+                kwarda: document.getElementById('inp-kwarda').value.trim(),
+                tanggal: document.getElementById('inp-tanggal').value,
+                score: scoreObj.score,
+                predicate: scoreObj.predicate,
+                fardhuCount: getFardhuCheckedCount(),
+                juz: parseInt(document.getElementById('tilawah-juz').value) || 0,
+                surah: document.getElementById('tilawah-surah').value.trim(),
+                infaq: parseFloat(document.getElementById('amalan-infaq').value) || 0,
+                catatan: document.getElementById('inp-catatan').value.trim(),
+                createdAt: new Date().toISOString()
+            };
+
+            // Save to Cloud Firestore
+            if (isFirebaseOnline && mutabaahCollectionRef) {
+                try {
+                    await mutabaahCollectionRef.add(record);
+                } catch (err) {
+                    console.warn("Firestore save fallback to local storage:", err);
+                }
+            }
+
+            // Always update local cache & LocalStorage
+            localRecords.unshift(record);
+            localStorage.setItem('mutabaah_kembaranas_records', JSON.stringify(localRecords));
+
+            // Trigger Confetti Celebration
+            confetti({
+                particleCount: 80,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
+            showToast("Mutabaah berhasil disimpan! Bararakallah.", "success");
+            renderAllViews();
+            switchTab('history');
+        }
+
+        function getFardhuCheckedCount() {
+            const fardhu = ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'];
+            let count = 0;
+            fardhu.forEach(s => {
+                if (document.getElementById(`shalat-${s}`).checked) count++;
+            });
+            return count;
+        }
+
+        function resetForm() {
+            document.getElementById('mutabaah-form').reset();
+            setDefaultDate();
+            calcLiveScore();
+        }
+
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('inp-tanggal').value = today;
+        }
+
+        // ----------------------------------------------------
+        // 4. RENDER VIEWS & TAB SWITCHING
+        // ----------------------------------------------------
+        function switchTab(tabId) {
+            const tabs = ['form', 'history', 'leaderboard', 'report', 'admin'];
+            tabs.forEach(t => {
+                const view = document.getElementById(`view-${t}`);
+                const btn = document.getElementById(`tab-btn-${t}`);
+
+                if (t === tabId) {
+                    view.classList.remove('hidden');
+                    if (btn) btn.className = "tab-btn active-tab px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-amber-300 bg-emerald-800 transition flex items-center gap-2 whitespace-nowrap";
+                } else {
+                    view.classList.add('hidden');
+                    if (btn) btn.className = "tab-btn px-4 py-2 text-xs sm:text-sm font-medium rounded-lg text-emerald-200 hover:text-white hover:bg-emerald-800/40 transition flex items-center gap-2 whitespace-nowrap";
+                }
+            });
+
+            if (tabId === 'leaderboard') renderCharts();
+            if (tabId === 'report') generateReport('final');
+        }
+
+        function renderAllViews() {
+            renderHistoryTable();
+            renderLeaderboard();
+            renderAdminTable();
+            updateStatsSummary();
+        }
+
+        // Render Riwayat Saya Table
+        function renderHistoryTable() {
+            const tbody = document.getElementById('history-table-body');
+            tbody.innerHTML = '';
+
+            if (localRecords.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-slate-400">Belum ada riwayat mutabaah tersimpan.</td></tr>`;
+                return;
+            }
+
+            localRecords.forEach(rec => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold text-slate-700">${rec.tanggal}</td>
+                    <td class="p-3 font-medium text-slate-900">${escapeHtml(rec.nama)}</td>
+                    <td class="p-3 text-slate-600">${escapeHtml(rec.kwarda)}</td>
+                    <td class="p-3 text-center"><span class="bg-emerald-100 text-emerald-800 text-xs px-2 py-0.5 rounded-full font-bold">${rec.fardhuCount}/5</span></td>
+                    <td class="p-3 text-center font-medium">${rec.juz > 0 ? rec.juz + ' Juz' : '-'}</td>
+                    <td class="p-3 text-center text-amber-600 font-semibold">Rp ${rec.infaq.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-center font-extrabold text-emerald-700">${rec.score}</td>
+                    <td class="p-3 text-center"><span class="text-xs font-semibold px-2 py-0.5 rounded-full ${getBadgePredicate(rec.score).style}">${rec.predicate}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Render Leaderboard & Top Stats
+        function renderLeaderboard() {
+            const tbody = document.getElementById('leaderboard-table-body');
+            tbody.innerHTML = '';
+
+            // Aggregate score by participant name
+            const agg = {};
+            localRecords.forEach(r => {
+                const key = r.nama.toLowerCase();
+                if (!agg[key]) {
+                    agg[key] = { nama: r.nama, kwarda: r.kwarda, totalScore: 0, entries: 0 };
+                }
+                agg[key].totalScore += r.score;
+                agg[key].entries += 1;
+            });
+
+            const sorted = Object.values(agg).sort((a, b) => b.totalScore - a.totalScore).slice(0, 10);
+
+            if (sorted.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center p-6 text-slate-400">Belum ada data akumulasi leaderboard.</td></tr>`;
+                return;
+            }
+
+            sorted.forEach((item, idx) => {
+                const avg = Math.round(item.totalScore / item.entries);
+                const badge = getBadgePredicate(avg);
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-3 text-center font-extrabold ${idx === 0 ? 'text-amber-500 text-base' : idx === 1 ? 'text-slate-400' : idx === 2 ? 'text-amber-700' : 'text-slate-600'}">
+                        ${idx === 0 ? '🥇 1' : idx === 1 ? '🥈 2' : idx === 2 ? '🥉 3' : idx + 1}
+                    </td>
+                    <td class="p-3 font-bold text-slate-800">${escapeHtml(item.nama)}</td>
+                    <td class="p-3 text-slate-600">${escapeHtml(item.kwarda)}</td>
+                    <td class="p-3 text-center font-extrabold text-emerald-700">${item.totalScore} Pts <span class="text-xs font-normal text-slate-400">(${avg}/hr)</span></td>
+                    <td class="p-3 text-center"><span class="text-xs font-semibold px-2 py-0.5 rounded-full ${badge.style}">${badge.label}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateStatsSummary() {
+            const totalPeserta = new Set(localRecords.map(r => r.nama.toLowerCase())).size;
+            const totalInfaq = localRecords.reduce((acc, r) => acc + (r.infaq || 0), 0);
+            const totalJuz = localRecords.reduce((acc, r) => acc + (r.juz || 0), 0);
+            const avgScore = localRecords.length > 0 ? Math.round(localRecords.reduce((acc, r) => acc + r.score, 0) / localRecords.length) : 0;
+
+            document.getElementById('stat-total-peserta').innerText = totalPeserta;
+            document.getElementById('stat-total-infaq').innerText = `Rp ${totalInfaq.toLocaleString('id-ID')}`;
+            document.getElementById('stat-total-juz').innerText = `${totalJuz} Juz`;
+            document.getElementById('stat-avg-score').innerText = `${avgScore} Pts`;
+        }
+
+        // Render Chart.js
+        function renderCharts() {
+            const ctx = document.getElementById('chart-predikat');
+            if (!ctx) return;
+
+            let countBintang = 0, countPejuang = 0, countPandu = 0, countTunas = 0;
+            localRecords.forEach(r => {
+                if (r.score >= 90) countBintang++;
+                else if (r.score >= 75) countPejuang++;
+                else if (r.score >= 60) countPandu++;
+                else countTunas++;
+            });
+
+            if (predikatChart) predikatChart.destroy();
+
+            predikatChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Bintang Istiqomah', 'Pejuang Sunnah', 'Pandu Teladan', 'Tunas Harapan'],
+                    datasets: [{
+                        data: [countBintang, countPejuang, countPandu, countTunas],
+                        backgroundColor: ['#f59e0b', '#10b981', '#14b8a6', '#94a3b8']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        // ----------------------------------------------------
+        // 5. PRINTABLE REPORT & PDF GENERATOR
+        // ----------------------------------------------------
+        function generateReport(type) {
+            const tbody = document.getElementById('report-table-body');
+            tbody.innerHTML = '';
+
+            document.getElementById('report-date-subtitle').innerText = type === 'final' 
+                ? 'Laporan Akumulasi Akhir Seluruh Sesi Kegiatan Kembaranas III 2026'
+                : `Rekap Harian Kegiatan Tanggal: ${new Date().toLocaleDateString('id-ID')}`;
+
+            const agg = {};
+            localRecords.forEach(r => {
+                const key = r.nama.toLowerCase();
+                if (!agg[key]) {
+                    agg[key] = { nama: r.nama, kwarda: r.kwarda, fardhuTotal: 0, juzTotal: 0, infaqTotal: 0, scoreTotal: 0, count: 0 };
+                }
+                agg[key].fardhuTotal += r.fardhuCount;
+                agg[key].juzTotal += r.juz;
+                agg[key].infaqTotal += r.infaq;
+                agg[key].scoreTotal += r.score;
+                agg[key].count += 1;
+            });
+
+            const list = Object.values(agg).sort((a,b) => b.scoreTotal - a.scoreTotal);
+
+            // Set Summary Stats for Report Header
+            document.getElementById('rep-stat-peserta').innerText = list.length;
+            const grandInfaq = list.reduce((a,b) => a + b.infaqTotal, 0);
+            const grandJuz = list.reduce((a,b) => a + b.juzTotal, 0);
+            const grandAvg = list.length > 0 ? Math.round(list.reduce((a,b) => a + (b.scoreTotal/b.count), 0) / list.length) : 0;
+
+            document.getElementById('rep-stat-infaq').innerText = `Rp ${grandInfaq.toLocaleString('id-ID')}`;
+            document.getElementById('rep-stat-juz').innerText = `${grandJuz} Juz`;
+            document.getElementById('rep-stat-skor').innerText = `${grandAvg} Pts`;
+
+            list.forEach((item, idx) => {
+                const avgScore = Math.round(item.scoreTotal / item.count);
+                const avgFardhu = (item.fardhuTotal / item.count).toFixed(1);
+                const badge = getBadgePredicate(avgScore);
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2 border border-slate-300 text-center font-bold">${idx + 1}</td>
+                    <td class="p-2 border border-slate-300 font-semibold">${escapeHtml(item.nama)}</td>
+                    <td class="p-2 border border-slate-300">${escapeHtml(item.kwarda)}</td>
+                    <td class="p-2 border border-slate-300 text-center font-medium">${avgFardhu} / 5</td>
+                    <td class="p-2 border border-slate-300 text-center font-medium">${item.juzTotal} Juz</td>
+                    <td class="p-2 border border-slate-300 text-right">Rp ${item.infaqTotal.toLocaleString('id-ID')}</td>
+                    <td class="p-2 border border-slate-300 text-center font-bold text-emerald-800">${item.scoreTotal} Pts</td>
+                    <td class="p-2 border border-slate-300 text-center font-semibold text-xs">${badge.label}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ----------------------------------------------------
+        // 6. ADMIN MODE & SECURITY CONTROL
+        // ----------------------------------------------------
+        function toggleAdminMode() {
+            if (isAdminLoggedIn) {
+                // Logout Admin
+                isAdminLoggedIn = false;
+                document.getElementById('admin-btn-text').innerText = "Mode Admin";
+                document.getElementById('admin-icon').className = "fa-solid fa-lock";
+                document.getElementById('tab-btn-admin').classList.add('hidden');
+                switchTab('form');
+                showToast("Keluar dari Mode Admin.", "info");
+            } else {
+                // Open PIN verification modal
+                document.getElementById('pin-modal').classList.remove('hidden');
+                document.getElementById('admin-pin-input').focus();
+            }
+        }
+
+        function closePinModal() {
+            document.getElementById('pin-modal').classList.add('hidden');
+            document.getElementById('admin-pin-input').value = '';
+        }
+
+        function verifyAdminPin() {
+            const pin = document.getElementById('admin-pin-input').value;
+            if (pin === ADMIN_PIN_DEFAULT) {
+                isAdminLoggedIn = true;
+                closePinModal();
+                document.getElementById('admin-btn-text').innerText = "Admin Active (Keluar)";
+                document.getElementById('admin-icon').className = "fa-solid fa-unlock-keyhole";
+                document.getElementById('tab-btn-admin').classList.remove('hidden');
+                switchTab('admin');
+                showToast("Login Admin Berhasil!", "success");
+            } else {
+                showToast("PIN Admin Salah!", "error");
+            }
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById('admin-table-body');
+            tbody.innerHTML = '';
+
+            document.getElementById('admin-count-badge').innerText = localRecords.length;
+
+            localRecords.forEach((rec, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 admin-row";
+                tr.innerHTML = `
+                    <td class="p-3 font-medium text-slate-600">${rec.tanggal}</td>
+                    <td class="p-3 font-bold text-slate-800 search-nama">${escapeHtml(rec.nama)}</td>
+                    <td class="p-3 text-slate-600 search-kwarda">${escapeHtml(rec.kwarda)}</td>
+                    <td class="p-3 text-center font-bold text-emerald-700">${rec.score}</td>
+                    <td class="p-3 text-center">${rec.juz} Juz</td>
+                    <td class="p-3 text-right">Rp ${rec.infaq.toLocaleString('id-ID')}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteRecord('${rec.id}', ${idx})" class="px-2.5 py-1 bg-rose-100 text-rose-700 hover:bg-rose-200 rounded-lg text-xs font-bold transition">
+                            <i class="fa-solid fa-trash"></i> Hapus
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterAdminTable() {
+            const query = document.getElementById('admin-search-inp').value.toLowerCase();
+            const rows = document.querySelectorAll('.admin-row');
+
+            rows.forEach(row => {
+                const nama = row.querySelector('.search-nama').innerText.toLowerCase();
+                const kwarda = row.querySelector('.search-kwarda').innerText.toLowerCase();
+                if (nama.includes(query) || kwarda.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        async function deleteRecord(docId, localIdx) {
+            if (!isAdminLoggedIn) return;
+
+            // Delete from Firestore
+            if (isFirebaseOnline && mutabaahCollectionRef && docId) {
+                try {
+                    await mutabaahCollectionRef.doc(docId).delete();
+                } catch (e) {
+                    console.warn("Firestore delete failed:", e);
+                }
+            }
+
+            localRecords.splice(localIdx, 1);
+            localStorage.setItem('mutabaah_kembaranas_records', JSON.stringify(localRecords));
+            showToast("Data mutabaah dihapus.", "info");
+            renderAllViews();
+        }
+
+        function toggleLockForm() {
+            isFormLocked = !isFormLocked;
+            localStorage.setItem('mutabaah_locked', isFormLocked);
+            checkLockState();
+            showToast(isFormLocked ? "Pengisian form dikunci untuk peserta." : "Pengisian form dibuka kembali.", "info");
+        }
+
+        function checkLockState() {
+            const warning = document.getElementById('lock-warning');
+            const submitBtn = document.getElementById('submit-btn');
+            const btnLabel = document.getElementById('lock-btn-label');
+
+            if (isFormLocked) {
+                warning.classList.remove('hidden');
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                if (btnLabel) btnLabel.innerText = "Buka Kunci Form Pengisian";
+            } else {
+                warning.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                if (btnLabel) btnLabel.innerText = "Kunci Form Pengisian";
+            }
+        }
+
+        function saveBroadcastText() {
+            const text = document.getElementById('inp-broadcast-admin').value.trim();
+            if (text) {
+                document.getElementById('broadcast-text').innerText = text;
+                showToast("Pengumuman berhasil diperbarui!", "success");
+            }
+        }
+
+        // Export to CSV Function
+        function exportToCSV() {
+            if (localRecords.length === 0) {
+                showToast("Tidak ada data untuk diekspor!", "error");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "ID,Tanggal,Nama,Kwarda_Regu,Skor,Predikat,Fardhu_Tercapai,Juz_Tilawah,Surah_Ayat,Infaq_Rp,Catatan\n";
+
+            localRecords.forEach(r => {
+                const row = [
+                    `"${r.id}"`,
+                    `"${r.tanggal}"`,
+                    `"${r.nama.replace(/"/g, '""')}"`,
+                    `"${r.kwarda.replace(/"/g, '""')}"`,
+                    r.score,
+                    `"${r.predicate}"`,
+                    r.fardhuCount,
+                    r.juz,
+                    `"${(r.surah || '').replace(/"/g, '""')}"`,
+                    r.infaq,
+                    `"${(r.catatan || '').replace(/"/g, '""')}"`
+                ].join(",");
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Mutabaah_Kembaranas_2026_Export_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("File CSV berhasil diunduh!", "success");
+        }
+
+        // ----------------------------------------------------
+        // UTILITIES & HELPER FUNCTIONS
+        // ----------------------------------------------------
+        function showToast(message, type = "info") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bgClass = "bg-slate-900 text-white";
+            if (type === "success") bgClass = "bg-emerald-700 text-white";
+            if (type === "error") bgClass = "bg-rose-700 text-white";
+
+            toast.className = `${bgClass} px-4 py-3 rounded-xl shadow-xl text-xs sm:text-sm font-semibold flex items-center gap-2 transform transition-all duration-300 pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-info'}"></i> ${message}`;
+            
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
